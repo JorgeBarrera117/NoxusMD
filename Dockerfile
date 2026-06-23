@@ -1,18 +1,16 @@
-FROM php:8.2-cli
+FROM python:3.11-slim
 
-# Instalar Python 3 y pip
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip python3-venv && \
-    rm -rf /var/lib/apt/lists/*
-
-# Crear un entorno virtual para Python e instalar markitdown con todas sus dependencias (incluyendo soporte para PDF)
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip3 install "markitdown[all]"
-
-# Copiar todo el código al directorio raíz del servidor
-COPY . /app
+# Set working directory
 WORKDIR /app
 
-# Iniciar el servidor web interno de PHP usando el puerto dinámico de Railway
-CMD php -S 0.0.0.0:$PORT
+# Copy the Python backend files
+COPY ./laboratorio_ia /app
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the dynamic port provided by Railway
+EXPOSE $PORT
+
+# Start the FastAPI server
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
