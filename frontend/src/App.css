@@ -937,3 +937,110 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* ==========================================================================
+   Export Buttons (Premium UI)
+   ========================================================================== */
+.export-btn {
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+}
+
+.word-btn {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.word-btn:hover {
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 6px 15px rgba(56, 189, 248, 0.15);
+  color: #7dd3fc;
+}
+
+.pdf-btn {
+  background: linear-gradient(135deg, #4c1d95, #312e81);
+  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-btn:hover {
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.25);
+  color: #ddd6fe;
+}
+
+/* ==========================================================================
+   Print Styles for Native PDF Export
+   ========================================================================== */
+@media print {
+  /* Reset general para que el texto ocupe toda la hoja */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body, html, #root, .app-layout, .main-content-area, .view-container, .split-layout, .card, .preview-pane, .markdown-preview-content {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+
+  .preview-pane {
+    width: 100% !important;
+  }
+  
+  .markdown-preview-content {
+    padding: 10px !important;
+  }
+  
+  /* Evitar cortes feos a mitad de imágenes y tablas */
+  .markdown-preview-content table {
+    page-break-inside: auto !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  .markdown-preview-content tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+  .markdown-preview-content img, .markdown-preview-content pre {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Ocultar barra lateral y paneles interactivos (AL FINAL PARA MAYOR PRIORIDAD) */
+  #root .sidebar, 
+  #root .view-header, 
+  #root .editor-pane, 
+  #root .export-toolbar, 
+  #root .print-hide, 
+  #root .card-title {
+    display: none !important;
+  }
+}
