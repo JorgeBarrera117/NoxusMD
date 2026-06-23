@@ -7,14 +7,19 @@ header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json; charset=utf-8');
 
+// Evitar que el script muera por timeout con PDFs grandes (5 minutos máximo)
+set_time_limit(300);
+
 // Manejar preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
+require_once __DIR__ . '/../services/Formatter.php';
+
 if (empty($_FILES['archivo'])) {
-    echo json_encode(['success' => false, 'error' => 'No se recibió ningún archivo.']);
+    echo json_encode(['success' => false, 'error' => 'No se recibió ningún archivo.'], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
 
@@ -31,7 +36,7 @@ $tmpPdf = $tmpDir . DIRECTORY_SEPARATOR . $uniqId . '_' . basename($archivo['nam
 $tmpMd = $tmpDir . DIRECTORY_SEPARATOR . $uniqId . '.md';
 
 if (!move_uploaded_file($archivo['tmp_name'], $tmpPdf)) {
-    echo json_encode(['success' => false, 'error' => 'Error interno al guardar el archivo temporal.']);
+    echo json_encode(['success' => false, 'error' => 'Error interno al guardar el archivo temporal.'], JSON_INVALID_UTF8_SUBSTITUTE);
     exit;
 }
 
@@ -55,18 +60,39 @@ if (!file_exists($tmpMd)) {
 }
 
 // Leer el Markdown resultante
-$contenido = file_get_contents($tmpMd);
+if (!file_exists($tmpMd)) {
+    echo json_encode(['success' => false, 'error' => "El comando markitdown falló. Output: $output"], JSON_INVALID_UTF8_SUBSTITUTE);
+    @unlink($tmpPdf);
+    exit;
+}
+
+$contenido = @file_get_contents($tmpMd);
 if ($encoding === 'utf8') {
     $contenido = mb_convert_encoding($contenido, 'UTF-8', 'auto');
+}
+
+// Aplicar Formato Mágico si fue solicitado
+$magicFormat = $_POST['magicFormat'] ?? 'false';
+$apiKey = $_POST['apiKey'] ?? '';
+
+if ($magicFormat === 'true') {
+    if (!empty($apiKey)) {
+        // Usar Inteligencia Artificial de Gemini
+        $contenido = Formatter::formatAI($contenido, $apiKey);
+    } else {
+        // Usar Reglas Locales Gratis
+        $contenido = Formatter::formatLocal($contenido);
+    }
 }
 
 // Limpiar archivos temporales
 @unlink($tmpPdf);
 @unlink($tmpMd);
 
-// Devolver el contenido convertido y el nombre base
-echo json_encode([
-    'success' => true,
-    'markdown' => $contenido,
-    'originalName' => $originalName
-]);
+// Enviar respuesta
+$res = json_encode(['success' => true, 'markdown' => $contenido, 'originalName' => $originalName], JSON_INVALID_UTF8_SUBSTITUTE);
+if ($res === false) {
+    echo json_encode(['success' => false, 'error' => 'Error al codificar el JSON: ' . json_last_error_msg()], JSON_INVALID_UTF8_SUBSTITUTE);
+} else {
+    echo $res;
+}
