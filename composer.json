@@ -1,0 +1,8 @@
+{
+  "name": "jorgebarrera117/noxus-md",
+  "description": "Backend API para Noxus MD",
+  "type": "project",
+  "require": {
+    "php": ">=7.4"
+  }
+}
