@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarkItDown GUI</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1 class="app-title">MarkItDown <span>GUI</span></h1>
+
+    <div class="card" id="card-archivo">
+      <label class="label">Archivo a convertir</label>
+      <div class="drop-zone" id="dropZone">
+        <span class="drop-icon">📂</span>
+        <p class="drop-strong">Arrastra tu archivo aquí</p>
+        <p class="drop-hint">o haz clic para seleccionar · PDF, DOCX, PPTX, XLSX, HTML, CSV…</p>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.pptx,.xlsx,.csv,.html,.odt,.txt">
+      </div>
+      <div class="file-pill" id="filePill">
+        <span class="pill-icon">📄</span>
+        <span class="pill-name" id="fileName"></span>
+        <button class="pill-remove" id="removeFile">✕</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="label">Carpeta de destino</label>
+      <div class="path-row">
+        <input type="text" id="destPath" placeholder="C:/xampp/htdocs/markitdown/output/">
+        <button id="btnBrowseFolder" class="btn-secondary" type="button" style="margin-right: 5px;">Explorar...</button>
+        <button id="btnSameFolder" class="btn-secondary" type="button">Misma carpeta</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="label">Nombre del archivo de salida</label>
+      <div class="path-row">
+        <input type="text" id="outName" placeholder="resultado">
+        <span class="ext-badge">.md</span>
+      </div>
+      <p class="hint-text">Déjalo vacío para usar el nombre del archivo original</p>
+    </div>
+
+    <div class="card">
+      <label class="label">Opciones</label>
+      <div class="options-list">
+        <label class="option-item">
+          <input type="checkbox" id="optEncoding" checked>
+          Guardar con UTF-8 (recomendado para español)
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="optPreview" checked>
+          Mostrar vista previa al terminar
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-convert" id="btnConvert">
+      ⚡ Convertir a Markdown
+    </button>
+
+    <div class="card" id="outputSection">
+      <div class="status-ok" id="statusMsg"></div>
+      <label class="label" style="margin-top: 12px;">Vista previa</label>
+      <textarea class="output-box" id="previewBox" readonly></textarea>
+      <div class="output-actions">
+        <button class="btn-secondary" id="btnCopy">📋 Copiar</button>
+        <button class="btn-secondary" id="btnDownload">⬇ Descargar .md</button>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
