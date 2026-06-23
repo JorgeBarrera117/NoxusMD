@@ -1,8 +1,8 @@
 import React from 'react';
-import { FileText, Edit3, Settings, History } from 'lucide-react';
+import { FileText, Edit3, Settings, History, ChevronLeft, ChevronRight } from 'lucide-react';
 import NoxusLogo from './NoxusLogo';
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
     { id: 'converter', icon: FileText, label: 'Convertidor PDF' },
     { id: 'editor', icon: Edit3, label: 'Editor Markdown' },
@@ -11,12 +11,22 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-header">
-        <h1 className="logo sidebar-logo">
-          <NoxusLogo className="logo-icon" style={{ width: '1.5em', height: '1.5em' }} /> 
-          <span className="noxus-text">Noxus</span>
-          <span className="accent">MD</span>
+    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <button 
+        className="sidebar-toggle-btn"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        title={isCollapsed ? "Expandir menú" : "Contraer menú"}
+      >
+        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
+
+      <div className="sidebar-header" style={{ textAlign: 'center' }}>
+        <h1 className="logo sidebar-logo" style={{ flexDirection: 'column', gap: 0 }}>
+          <NoxusLogo className="logo-icon" style={{ width: isCollapsed ? '1.5em' : '2.2em', height: isCollapsed ? '1.5em' : '2.2em', transition: 'all 0.3s ease' }} /> 
+          <div className="logo-text-wrapper" style={{ marginTop: '-4px' }}>
+            <span className="noxus-text">Noxus</span>
+            <span className="accent">MD</span>
+          </div>
         </h1>
       </div>
       <nav className="sidebar-nav">
@@ -28,15 +38,17 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               key={item.id}
               className={`nav-btn ${isActive ? 'active' : ''}`}
               onClick={() => setActiveTab(item.id)}
+              title={isCollapsed ? item.label : undefined}
+              style={item.id === 'settings' ? { marginTop: 'auto' } : {}}
             >
               <Icon size={20} className="nav-icon" />
-              <span>{item.label}</span>
+              <span className="nav-label">{item.label}</span>
             </button>
           );
         })}
       </nav>
       <div className="sidebar-footer">
-        <p>NoxusMD v2.0</p>
+        <p className="footer-text">NoxusMD v2.0</p>
       </div>
     </aside>
   );

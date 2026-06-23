@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Trash2, Clock } from 'lucide-react';
+import { FileText, Download, Trash2, Clock, Search } from 'lucide-react';
 
 const HistoryView = ({ onViewInEditor }) => {
   const [history, setHistory] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const savedHistory = localStorage.getItem('noxus_history');
@@ -28,15 +29,38 @@ const HistoryView = ({ onViewInEditor }) => {
     URL.revokeObjectURL(url);
   };
 
+  const filteredHistory = history.filter(item => 
+    item.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="view-container history-view">
-      <header className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
+      <header className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, paddingRight: '2rem' }}>
           <h2>Historial de Conversiones</h2>
-          <p>Tus últimos documentos convertidos localmente</p>
+          <p style={{ marginBottom: '1.5rem' }}>Tus últimos documentos convertidos localmente</p>
+          
+          {history.length > 0 && (
+            <div className="search-container" style={{ position: 'relative', maxWidth: '400px' }}>
+              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input 
+                type="text" 
+                className="output-box" 
+                placeholder="Buscar por nombre..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ paddingLeft: '2.75rem', width: '100%', boxSizing: 'border-box' }}
+              />
+            </div>
+          )}
         </div>
+        
         {history.length > 0 && (
-          <button className="secondary-btn danger-text" onClick={clearHistory}>
+          <button 
+            className="secondary-btn danger-text" 
+            onClick={clearHistory}
+            style={{ flex: 'none', padding: '0.5rem 1rem', marginTop: '0.5rem' }}
+          >
             <Trash2 size={16} /> Borrar todo
           </button>
         )}
@@ -51,8 +75,16 @@ const HistoryView = ({ onViewInEditor }) => {
               <p>Los archivos que conviertas aparecerán aquí para que no los pierdas.</p>
             </div>
           </div>
+        ) : filteredHistory.length === 0 ? (
+          <div className="card placeholder-card">
+            <div className="placeholder-content">
+              <Search className="placeholder-icon" size={64} />
+              <h3>No se encontraron resultados</h3>
+              <p>No hay ningún archivo que coincida con "{searchQuery}".</p>
+            </div>
+          </div>
         ) : (
-          history.map((item, index) => (
+          filteredHistory.map((item, index) => (
             <div key={index} className="card history-card" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div className="history-info" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <FileText size={32} className="accent-text" />

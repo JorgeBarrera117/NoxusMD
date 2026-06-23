@@ -65,8 +65,6 @@ const ConverterView = ({ apiKey, onConvertSuccess }) => {
         setResult(data);
         // Pass the result up so Editor and History can use it
         if (onConvertSuccess) onConvertSuccess(data);
-        
-        downloadMarkdown(data.markdown, data.originalName);
       } else {
         setError(data.error || 'Ocurrió un error desconocido.');
       }
@@ -166,7 +164,7 @@ const ConverterView = ({ apiKey, onConvertSuccess }) => {
             {isConverting ? (
               <><RefreshCw className="spin-icon" size={20} /> Convirtiendo...</>
             ) : (
-              <><Zap className="action-icon" size={20} /> Convertir y Descargar Markdown</>
+              <><Zap className="action-icon" size={20} /> Convertir a Markdown</>
             )}
           </button>
 

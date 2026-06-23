@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const EditorView = ({ initialMarkdown }) => {
   const [markdown, setMarkdown] = useState(initialMarkdown || '# ¡Bienvenido al Editor Markdown!\n\nEscribe aquí tu código Markdown y mira el resultado a la derecha.\n\n* Soporta listas\n* **Negritas** y *cursivas*');
@@ -19,21 +20,21 @@ const EditorView = ({ initialMarkdown }) => {
       </header>
 
       <div className="split-layout editor-layout" style={{ height: 'calc(100vh - 150px)' }}>
-        <div className="card editor-pane">
-          <h3 className="card-title">CÓDIGO FUENTE</h3>
+        <div className="card editor-pane" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <h3 className="card-title" style={{ flexShrink: 0 }}>CÓDIGO FUENTE</h3>
           <textarea
             className="output-box"
-            style={{ height: '100%', border: 'none', resize: 'none' }}
+            style={{ flexGrow: 1, border: 'none', resize: 'none', minHeight: '300px' }}
             value={markdown}
             onChange={(e) => setMarkdown(e.target.value)}
             placeholder="Escribe tu Markdown aquí..."
           />
         </div>
         
-        <div className="card preview-pane" style={{ overflowY: 'auto' }}>
-          <h3 className="card-title">VISTA PREVIA RENDERIZADA</h3>
-          <div className="markdown-preview-content">
-            <ReactMarkdown>{markdown}</ReactMarkdown>
+        <div className="card preview-pane" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+          <h3 className="card-title" style={{ flexShrink: 0 }}>VISTA PREVIA RENDERIZADA</h3>
+          <div className="markdown-preview-content" style={{ overflowY: 'auto', flexGrow: 1, paddingRight: '0.5rem', margin: '0 -0.5rem 0 0' }}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
           </div>
         </div>
       </div>
