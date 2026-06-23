@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 # Instalar Python 3 y pip, necesarios para ejecutar markitdown
 RUN apt-get update && \
@@ -10,15 +10,9 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip3 install markitdown
 
-# Habilitar mod_rewrite para Apache (CORS y URLs)
-RUN a2enmod rewrite
+# Copiar todo el código al directorio raíz del servidor
+COPY . /app
+WORKDIR /app
 
-# Permitir a Apache escuchar en el puerto dinámico de Railway
-ENV PORT=80
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-# Copiar todo el código al directorio raíz del servidor web
-COPY . /var/www/html/
-
-# Configurar permisos
-RUN chown -R www-data:www-data /var/www/html
+# Iniciar el servidor web interno de PHP usando el puerto dinámico de Railway
+CMD php -S 0.0.0.0:$PORT
