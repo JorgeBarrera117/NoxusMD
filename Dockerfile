@@ -13,6 +13,10 @@ RUN pip3 install markitdown
 # Habilitar mod_rewrite para Apache (CORS y URLs)
 RUN a2enmod rewrite
 
+# Permitir a Apache escuchar en el puerto dinámico de Railway
+ENV PORT=80
+RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+
 # Copiar todo el código al directorio raíz del servidor web
 COPY . /var/www/html/
 
