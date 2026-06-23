@@ -64,15 +64,6 @@ body {
   border-color: #4f8ef7;
 }
 
-.drop-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
 .drop-icon {
   font-size: 2rem;
   display: block;
@@ -93,7 +84,7 @@ body {
 
 /* File pill */
 .file-pill {
-  display: none;
+  display: flex;
   align-items: center;
   gap: 10px;
   background: #f1f5ff;
@@ -101,10 +92,6 @@ body {
   border-radius: 8px;
   padding: 10px 14px;
   margin-top: 10px;
-}
-
-.file-pill.visible {
-  display: flex;
 }
 
 .pill-icon {
@@ -135,74 +122,6 @@ body {
 .pill-remove:hover {
   background: #fee2e2;
   color: #dc2626;
-}
-
-/* Path row */
-.path-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.path-row input[type="text"] {
-  flex: 1;
-}
-
-.ext-badge {
-  font-size: 14px;
-  font-weight: 600;
-  color: #4f8ef7;
-  white-space: nowrap;
-}
-
-.hint-text {
-  font-size: 12px;
-  color: #94a3b8;
-  margin-top: 6px;
-}
-
-/* Inputs */
-input[type="text"],
-textarea {
-  width: 100%;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-  font-family: inherit;
-  color: #1a1a2e;
-  background: #f8fafc;
-  transition: border-color 0.2s;
-  outline: none;
-}
-
-input[type="text"]:focus,
-textarea:focus {
-  border-color: #4f8ef7;
-  background: #fff;
-}
-
-/* Options */
-.options-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.option-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #334155;
-  cursor: pointer;
-}
-
-.option-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #4f8ef7;
-  cursor: pointer;
 }
 
 /* Buttons */
@@ -250,14 +169,6 @@ textarea:focus {
 }
 
 /* Output */
-#outputSection {
-  display: none;
-}
-
-#outputSection.visible {
-  display: block;
-}
-
 .status-ok {
   display: flex;
   align-items: center;
@@ -268,6 +179,7 @@ textarea:focus {
 }
 
 .output-box {
+  width: 100%;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -278,6 +190,12 @@ textarea:focus {
   min-height: 160px;
   resize: vertical;
   margin-top: 8px;
+  outline: none;
+}
+
+.output-box:focus {
+  border-color: #4f8ef7;
+  background: #fff;
 }
 
 .output-actions {
@@ -288,17 +206,13 @@ textarea:focus {
 
 /* Error */
 .error-box {
-  display: none;
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 10px;
   padding: 1rem;
   color: #dc2626;
   font-size: 14px;
-}
-
-.error-box.visible {
-  display: block;
+  margin-bottom: 1rem;
 }
 
 /* Loading spinner */
