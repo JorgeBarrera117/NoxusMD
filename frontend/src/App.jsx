@@ -108,8 +108,8 @@ function App() {
     formData.append('apiKey', apiKey.trim())
 
     try {
-      // Ajusta la URL usando 127.0.0.1 para evitar problemas de IPv6
-      const res = await fetch('http://127.0.0.1/Markitdow/backend/api/convert.php', {
+      // Usar la URL de producción alojada en Railway
+      const res = await fetch('https://noxusmd-production.up.railway.app/backend/api/convert.php', {
         method: 'POST',
         body: formData
       })
