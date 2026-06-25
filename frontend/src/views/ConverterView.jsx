@@ -93,7 +93,7 @@ const ConverterView = ({ apiKey, onConvertSuccess }) => {
       <div className="split-layout">
         <div className="left-panel">
           <header className="view-header">
-            <h2>Convertidor PDF</h2>
+            <h2>Conversor PDF</h2>
             <p>Sube tu documento y extráelo como Markdown limpio</p>
           </header>
 

@@ -1,11 +1,12 @@
 import React from 'react';
-import { FileText, Edit3, Settings, History, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, Edit3, Settings, History, ChevronLeft, ChevronRight, Workflow, FileCode2, FileUp } from 'lucide-react';
 import NoxusLogo from './NoxusLogo';
 
 const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
-    { id: 'converter', icon: FileText, label: 'Convertidor PDF' },
-    { id: 'editor', icon: Edit3, label: 'Editor Markdown' },
+    { id: 'editor', icon: FileCode2, label: 'Editor Markdown' },
+    { id: 'converter', icon: FileUp, label: 'Conversor PDF' },
+    { id: 'mermaid', icon: Workflow, label: 'Diagramas' },
     { id: 'history', icon: History, label: 'Historial' },
     { id: 'settings', icon: Settings, label: 'Configuración' },
   ];

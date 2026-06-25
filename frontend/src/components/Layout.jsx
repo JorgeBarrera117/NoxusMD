@@ -12,7 +12,7 @@ const Layout = ({ activeTab, setActiveTab, children }) => {
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
       />
-      <div className="main-content-area">
+      <div className={`main-content-area ${['editor', 'mermaid', 'converter'].includes(activeTab) ? 'full-bleed' : ''}`}>
         {children}
       </div>
     </div>

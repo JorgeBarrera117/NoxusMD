@@ -12,6 +12,8 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@excalidraw/mermaid-to-excalidraw": "^2.2.2",
     "file-saver": "^2.0.5",
     "html-docx-js": "^0.3.1",
     "html2pdf.js": "^0.14.0",

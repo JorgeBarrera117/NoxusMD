@@ -4,27 +4,30 @@ import ConverterView from './views/ConverterView';
 import EditorView from './views/EditorView';
 import HistoryView from './views/HistoryView';
 import SettingsView from './views/SettingsView';
+import MermaidView from './views/MermaidView';
 import './App.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('converter');
+  const [activeTab, setActiveTab] = useState('editor');
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('noxus_api_key') || '');
   const [editorMarkdown, setEditorMarkdown] = useState('');
+  const [mermaidCode, setMermaidCode] = useState('');
 
   // Cuando una conversión tiene éxito, la guardamos en el historial y la pasamos al editor
   const handleConvertSuccess = (data) => {
     setEditorMarkdown(data.markdown);
+    setActiveTab('editor');
     
     // Guardar en historial local
     const newItem = {
+      id: Date.now(),
       filename: data.originalName,
       content: data.markdown,
       date: new Date().toISOString()
     };
     
-    const currentHistory = JSON.parse(localStorage.getItem('noxus_history') || '[]');
-    const newHistory = [newItem, ...currentHistory].slice(0, 10); // Guardar máximo 10
-    localStorage.setItem('noxus_history', JSON.stringify(newHistory));
+    const history = JSON.parse(localStorage.getItem('noxus_history') || '[]');
+    localStorage.setItem('noxus_history', JSON.stringify([newItem, ...history]));
   };
 
   const handleViewInEditor = (content) => {
@@ -34,30 +37,33 @@ function App() {
 
   return (
     <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {activeTab === 'converter' && (
+      <div style={{ display: activeTab === 'converter' ? 'block' : 'none', height: '100%' }}>
         <ConverterView 
           apiKey={apiKey} 
           onConvertSuccess={handleConvertSuccess} 
         />
-      )}
-      {activeTab === 'editor' && (
+      </div>
+      <div style={{ display: activeTab === 'editor' ? 'block' : 'none', height: '100%' }}>
         <EditorView 
           initialMarkdown={editorMarkdown} 
         />
-      )}
-      {activeTab === 'history' && (
+      </div>
+      <div style={{ display: activeTab === 'mermaid' ? 'block' : 'none', height: '100%' }}>
+        <MermaidView initialMermaidCode={mermaidCode} />
+      </div>
+      <div style={{ display: activeTab === 'history' ? 'block' : 'none', height: '100%' }}>
         <HistoryView 
           onViewInEditor={handleViewInEditor} 
         />
-      )}
-      {activeTab === 'settings' && (
+      </div>
+      <div style={{ display: activeTab === 'settings' ? 'block' : 'none', height: '100%' }}>
         <SettingsView 
           apiKey={apiKey} 
           setApiKey={setApiKey} 
         />
-      )}
+      </div>
     </Layout>
   );
-}
+};
 
 export default App;

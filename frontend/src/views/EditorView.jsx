@@ -8,7 +8,7 @@ import {
   FileDown, FileText, Bold, Italic, Strikethrough, 
   Link as LinkIcon, Image as ImageIcon, Code,
   Heading1, List, ListOrdered, Quote,
-  CheckSquare, Table, Minus, Terminal, Workflow
+  CheckSquare, Table, Minus, Terminal, Workflow, Save, FolderOpen
 } from 'lucide-react';
 import EditorModule from 'react-simple-code-editor';
 const Editor = EditorModule.default || EditorModule;
@@ -118,13 +118,43 @@ const MermaidComponent = ({ code }) => {
 };
 
 const EditorView = ({ initialMarkdown }) => {
-  const [markdown, setMarkdown] = useState(initialMarkdown || '# Welcome to NoxusMD Editor\n\n## High-Performance Document Engineering\n\nThis is a **sophisticated** technical environment designed for developers.\n\n- **Automated Formatting:** Just type and we handle the rest.\n- **Real-time Synchronization:** What you see is what you get.\n');
+  const [markdown, setMarkdown] = useState(() => {
+    return sessionStorage.getItem('noxus_editor_content') || initialMarkdown || '# Welcome to NoxusMD Editor\n\n## High-Performance Document Engineering\n\nThis is a **sophisticated** technical environment designed for developers.\n\n- **Automated Formatting:** Just type and we handle the rest.\n- **Real-time Synchronization:** What you see is what you get.\n';
+  });
   const previewRef = useRef(null);
   const fileInputRef = useRef(null);
+  const mdInputRef = useRef(null);
+
+  const handleSaveMarkdown = () => {
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    saveAs(blob, 'Documento_NoxusMD.md');
+  };
+
+  const handleLoadMarkdown = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setMarkdown(event.target.result);
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+  
+  const triggerMarkdownLoad = () => {
+    if (mdInputRef.current) {
+      mdInputRef.current.click();
+    }
+  };
 
   useEffect(() => {
     if (initialMarkdown) setMarkdown(initialMarkdown);
   }, [initialMarkdown]);
+
+  useEffect(() => {
+    sessionStorage.setItem('noxus_editor_content', markdown);
+  }, [markdown]);
 
   useEffect(() => {
     const handleUpdateWidth = (e) => {
@@ -138,7 +168,7 @@ const EditorView = ({ initialMarkdown }) => {
     return () => window.removeEventListener('update-image-width', handleUpdateWidth);
   }, []);
 
-  const exportToPDF = () => { window.print(); };
+
 
   const exportToWord = async () => {
     const element = previewRef.current;
@@ -267,22 +297,8 @@ const EditorView = ({ initialMarkdown }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await fetch('http://localhost:8000/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-      if (data.url) {
-        insertTextAtCursor(`\n<img src="${data.url}" width="400" />\n`);
-      }
-    } catch (err) {
-      console.error('Error uploading image:', err);
-      alert('Error uploading image to local backend.');
-    }
+    const objectUrl = URL.createObjectURL(file);
+    insertTextAtCursor(`\n<img src="${objectUrl}" width="400" />\n`);
     e.target.value = ''; // Resetear input
   };
 
@@ -290,12 +306,17 @@ const EditorView = ({ initialMarkdown }) => {
 
   return (
     <div className="view-container">
-      <div className="editor-layout" style={{ height: 'calc(100vh - 40px)' }}>
+      <div className="editor-layout" style={{ height: '100%' }}>
         
         {/* Panel Izquierdo: Editor con Toolbar */}
         <div className="editor-pane print-hide">
           {/* Toolbar del Editor */}
           <div className="editor-toolbar">
+            <div className="toolbar-group" style={{ marginRight: '0.5rem' }}>
+              <button className="toolbar-btn primary-action-btn" onClick={triggerMarkdownLoad} title="Cargar archivo .md"><FolderOpen size={16} /></button>
+              <button className="toolbar-btn primary-action-btn" onClick={handleSaveMarkdown} title="Guardar como .md"><Save size={16} /></button>
+            </div>
+            <div className="toolbar-divider"></div>
             <div className="toolbar-group">
               <button className="toolbar-btn" onClick={handleHeading} title="Heading"><Heading1 size={16} /></button>
             </div>
@@ -330,6 +351,13 @@ const EditorView = ({ initialMarkdown }) => {
             <div className="toolbar-badge">MARKDOWN</div>
             <input 
               type="file" 
+              accept=".md,.txt" 
+              ref={mdInputRef} 
+              style={{ display: 'none' }} 
+              onChange={handleLoadMarkdown} 
+            />
+            <input 
+              type="file" 
               accept="image/*" 
               ref={fileInputRef} 
               style={{ display: 'none' }} 
@@ -340,11 +368,7 @@ const EditorView = ({ initialMarkdown }) => {
           {/* Área de Edición con Números de Línea fakes */}
           <div className="editor-scroll-area">
             <div className="editor-wrapper">
-              <div className="line-numbers">
-                {Array.from({ length: Math.max(10, lineCount) }).map((_, i) => (
-                  <div key={i} className="line-number">{i + 1}</div>
-                ))}
-              </div>
+
               <Editor
                 value={markdown}
                 onValueChange={code => setMarkdown(code)}
@@ -375,11 +399,35 @@ const EditorView = ({ initialMarkdown }) => {
               <span className="autosaved-badge"><div className="pulse-dot"></div> Autosaved</span>
             </div>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={exportToWord} className="export-btn word-btn">
-                <FileText size={16} /> Word
-              </button>
-              <button onClick={exportToPDF} className="export-btn pdf-btn">
-                <FileDown size={16} /> PDF
+              <button 
+                onClick={exportToWord} 
+                className="export-btn premium-word-btn"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 16px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                  color: 'white',
+                  border: 'none',
+                  boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  letterSpacing: '0.5px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 99, 235, 0.4)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.3)';
+                }}
+              >
+                <FileText size={18} /> Exportar a word
               </button>
             </div>
           </div>
