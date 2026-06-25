@@ -3,8 +3,10 @@ import shutil
 import subprocess
 import traceback
 import requests
+import uuid
 from fastapi import FastAPI, UploadFile, Form, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import extractor
 
@@ -17,6 +19,25 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Configurar carpeta de uploads para imágenes
+uploads_dir = Path("uploads")
+uploads_dir.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.post("/upload-image")
+async def upload_image(image: UploadFile = File(...)):
+    try:
+        ext = image.filename.split('.')[-1] if '.' in image.filename else 'png'
+        filename = f"{uuid.uuid4().hex}.{ext}"
+        file_path = uploads_dir / filename
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+            
+        return {"url": f"http://localhost:8000/uploads/{filename}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 def format_local(text: str) -> str:
     lines = text.split('\n')
