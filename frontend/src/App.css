@@ -1172,7 +1172,7 @@ code[class*="language-"], pre[class*="language-"] {
     print-color-adjust: exact !important;
   }
 
-  body, html, #root, .app-layout, .main-content-area, .view-container, .split-layout, .card, .preview-pane, .markdown-preview-content {
+  body, html, #root, .app-layout, .main-content-area, .view-container, .split-layout, .editor-layout, .card, .preview-pane, .markdown-preview-content {
     display: block !important;
     position: static !important;
     height: auto !important;
