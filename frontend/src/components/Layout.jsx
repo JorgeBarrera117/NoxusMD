@@ -5,7 +5,7 @@ const Layout = ({ activeTab, setActiveTab, children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className={`app-layout ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div className={`app-layout ${isCollapsed ? 'sidebar-collapsed' : ''} ${activeTab === 'mermaid' ? 'mermaid-active' : ''}`}>
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 

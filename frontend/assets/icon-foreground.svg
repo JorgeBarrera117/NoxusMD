@@ -1,0 +1,27 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="noxus-grad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="50%" stop-color="#d946ef" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <g transform="scale(0.65) translate(12, 12)">
+      <path 
+        d="M 12 36 L 12 12 L 32 36 L 32 12" 
+        stroke="url(#noxus-grad)" 
+        stroke-width="6" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none" 
+      />
+      <path 
+        d="M 38 10 L 41 6 L 44 10 L 41 14 Z" 
+        fill="url(#noxus-grad)" 
+      />
+      <path 
+        d="M 6 38 L 8 36 L 10 38 L 8 40 Z" 
+        fill="url(#noxus-grad)" 
+      />
+  </g>
+</svg>

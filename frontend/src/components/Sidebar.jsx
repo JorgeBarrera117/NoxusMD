@@ -1,14 +1,14 @@
 import React from 'react';
-import { FileText, Edit3, Settings, History, ChevronLeft, ChevronRight, Workflow, FileCode2, FileUp } from 'lucide-react';
+import { FileEdit, FileText, Settings, History, ChevronLeft, ChevronRight, Network } from 'lucide-react';
 import NoxusLogo from './NoxusLogo';
 
 const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
   const menuItems = [
-    { id: 'editor', icon: FileCode2, label: 'Editor Markdown' },
-    { id: 'converter', icon: FileUp, label: 'Conversor PDF' },
-    { id: 'mermaid', icon: Workflow, label: 'Diagramas' },
+    { id: 'editor', icon: FileEdit, label: 'Editor' },
+    { id: 'converter', icon: FileText, label: 'PDF' },
+    { id: 'mermaid', icon: Network, label: 'Diagramas' },
     { id: 'history', icon: History, label: 'Historial' },
-    { id: 'settings', icon: Settings, label: 'Configuración' },
+    { id: 'settings', icon: Settings, label: 'Ajustes' },
   ];
 
   return (
@@ -40,7 +40,6 @@ const Sidebar = ({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) => {
               className={`nav-btn ${isActive ? 'active' : ''}`}
               onClick={() => setActiveTab(item.id)}
               title={isCollapsed ? item.label : undefined}
-              style={item.id === 'settings' ? { marginTop: 'auto' } : {}}
             >
               <Icon size={20} className="nav-icon" />
               <span className="nav-label">{item.label}</span>

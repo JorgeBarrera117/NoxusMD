@@ -4,6 +4,10 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import html2pdf from 'html2pdf.js';
 import { saveAs } from 'file-saver';
+import { asBlob } from 'html-docx-js-typescript';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { Capacitor } from '@capacitor/core';
 import { 
   FileDown, FileText, Bold, Italic, Strikethrough, 
   Link as LinkIcon, Image as ImageIcon, Code,
@@ -121,13 +125,61 @@ const EditorView = ({ initialMarkdown }) => {
   const [markdown, setMarkdown] = useState(() => {
     return sessionStorage.getItem('noxus_editor_content') || initialMarkdown || '# Welcome to NoxusMD Editor\n\n## High-Performance Document Engineering\n\nThis is a **sophisticated** technical environment designed for developers.\n\n- **Automated Formatting:** Just type and we handle the rest.\n- **Real-time Synchronization:** What you see is what you get.\n';
   });
+  const [initialRender, setInitialRender] = useState(true);
+  
+  // Mobile UI state
+  const [mobileView, setMobileView] = useState('editor'); // 'editor' | 'preview'
+
   const previewRef = useRef(null);
   const fileInputRef = useRef(null);
   const mdInputRef = useRef(null);
 
-  const handleSaveMarkdown = () => {
+  const handleSaveMarkdown = async () => {
     const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
-    saveAs(blob, 'Documento_NoxusMD.md');
+    const fileName = `Documento_NoxusMD_${Date.now()}.md`;
+    
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const savedFile = await Filesystem.writeFile({
+          path: fileName,
+          data: markdown,
+          directory: Directory.Cache,
+          encoding: Encoding.UTF8
+        });
+        await Share.share({
+          title: 'Exportar Markdown',
+          url: savedFile.uri,
+          dialogTitle: 'Guardar o Compartir MD'
+        });
+      } catch (err) {
+        console.error('Error sharing file', err);
+        alert('Error al exportar el archivo Markdown: ' + err.message);
+      }
+    } else {
+      try {
+        const file = new File([blob], fileName, { type: 'text/markdown' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: fileName,
+            });
+            return;
+          } catch (err) {
+            console.error("Web share failed", err);
+            if (err.name !== 'AbortError') {
+              // Fallback silente a descarga tradicional
+              saveAs(blob, fileName);
+            }
+          }
+        } else {
+          // Fallback silente si Web Share no está soportado
+          saveAs(blob, fileName);
+        }
+      } catch (err) {
+         alert("Error general: " + err.message);
+      }
+    }
   };
 
   const handleLoadMarkdown = (e) => {
@@ -247,9 +299,55 @@ const EditorView = ({ initialMarkdown }) => {
     hideElements.forEach(el => el.remove());
 
     const contentHtml = clone.innerHTML;
-    const fullHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Documento</title></head><body>${contentHtml}</body></html>`;
-    const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
-    saveAs(blob, 'Documento_NoxusMD.doc');
+    const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Documento</title></head><body>${contentHtml}</body></html>`;
+    
+    try {
+      const blob = await asBlob(fullHtml);
+      
+      const fileName = `Documento_NoxusMD_${Date.now()}.docx`;
+      if (Capacitor.isNativePlatform()) {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = async () => {
+          const base64data = reader.result.split(',')[1];
+          try {
+            const savedFile = await Filesystem.writeFile({
+              path: fileName,
+              data: base64data,
+              directory: Directory.Cache
+            });
+            
+            await Share.share({
+              title: 'Exportar Documento Word',
+              url: savedFile.uri,
+              dialogTitle: 'Guardar o Compartir DOCX'
+            });
+          } catch (err) {
+            console.error('Error saving or sharing file on mobile', err);
+            alert('Error al exportar el archivo Word en móvil: ' + err.message);
+          }
+        };
+      } else {
+        const file = new File([blob], fileName, { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: fileName,
+            });
+            return;
+          } catch (err) {
+            console.error("Web share failed", err);
+            if (err.name !== 'AbortError') saveAs(blob, fileName);
+          }
+        } else {
+          saveAs(blob, fileName);
+        }
+      }
+    } catch (err) {
+      console.error('Error sharing file', err);
+      alert('Error al exportar el archivo Word.');
+    }
   };
 
   // Funciones de la barra de herramientas
@@ -306,7 +404,25 @@ const EditorView = ({ initialMarkdown }) => {
 
   return (
     <div className="view-container">
-      <div className="editor-layout" style={{ height: '100%' }}>
+      {/* Mobile Tabs Control (Only visible on small screens due to media query display rule if needed, or always rendered but CSS hides it on desktop... actually let's just render it and use CSS to show only on mobile or flex column logic) */}
+      <div className="mobile-tabs-container print-hide">
+        <div className="mobile-tabs">
+          <button 
+            className={`mobile-tab-btn ${mobileView === 'editor' ? 'active' : ''}`}
+            onClick={() => setMobileView('editor')}
+          >
+            Editar
+          </button>
+          <button 
+            className={`mobile-tab-btn ${mobileView === 'preview' ? 'active' : ''}`}
+            onClick={() => setMobileView('preview')}
+          >
+            Vista Previa
+          </button>
+        </div>
+      </div>
+
+      <div className={`editor-layout split-layout mobile-mode-${mobileView}`} style={{ height: '100%' }}>
         
         {/* Panel Izquierdo: Editor con Toolbar */}
         <div className="editor-pane print-hide">

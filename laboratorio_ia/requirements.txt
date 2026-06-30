@@ -2,5 +2,7 @@ fastapi
 uvicorn
 python-multipart
 requests
+httpx
+aiofiles
 pymupdf4llm
 markitdown[all]

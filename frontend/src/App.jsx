@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import ConverterView from './views/ConverterView';
 import EditorView from './views/EditorView';
@@ -10,8 +10,21 @@ import './App.css';
 function App() {
   const [activeTab, setActiveTab] = useState('editor');
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('noxus_api_key') || '');
+  const apiServers = [
+    'https://noxusmd-production.up.railway.app/upload',
+    'https://noxusmd.onrender.com/upload'
+  ];
   const [editorMarkdown, setEditorMarkdown] = useState('');
   const [mermaidCode, setMermaidCode] = useState('');
+  const [theme, setTheme] = useState(() => localStorage.getItem('noxus_theme') || 'dark');
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.remove('light-theme');
+    }
+  }, [theme]);
 
   // Cuando una conversión tiene éxito, la guardamos en el historial y la pasamos al editor
   const handleConvertSuccess = (data) => {
@@ -40,6 +53,7 @@ function App() {
       <div style={{ display: activeTab === 'converter' ? 'block' : 'none', height: '100%' }}>
         <ConverterView 
           apiKey={apiKey} 
+          apiServers={apiServers}
           onConvertSuccess={handleConvertSuccess} 
         />
       </div>
@@ -60,6 +74,8 @@ function App() {
         <SettingsView 
           apiKey={apiKey} 
           setApiKey={setApiKey} 
+          theme={theme}
+          setTheme={setTheme}
         />
       </div>
     </Layout>
